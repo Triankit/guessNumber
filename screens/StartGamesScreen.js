@@ -1,17 +1,44 @@
-import React from 'react';
-import {TextInput, View, StyleSheet} from 'react-native';
+import React, {useState} from 'react';
+import {TextInput, View, StyleSheet, Alert} from 'react-native';
 import PrimaryButton from '../components/PrimaryButton';
 
-function StartGameScreen() {
+function StartGameScreen({onPickNumber}) {
+  const [enteredNumber, setEnteredNumber] = useState('');
+  function numberInputHandler(enteredText) {
+    setEnteredNumber(enteredText);
+  }
+  function confirmInputHandler() {
+    const choosenNumber = parseInt(enteredNumber);
+    if (isNaN(choosenNumber) || choosenNumber <= 0 || choosenNumber > 99) {
+      Alert.alert(
+        'Invalid Number',
+        'Number has to be a number between 1 and 99',
+        [{text: 'Okay', style: 'destructive', onPress: resetInputHandler}],
+      );
+      return;
+    }
+    onPickNumber(enteredNumber);
+  }
+  function resetInputHandler() {
+    setEnteredNumber('');
+  }
   return (
     <View style={styles.inputContainer}>
       <TextInput
         style={styles.numberInput}
         maxLength={2}
         keyboardType="number-pad"
+        value={enteredNumber}
+        onChangeText={numberInputHandler}
       />
-      <PrimaryButton>Reset</PrimaryButton>
-      <PrimaryButton>Confirm</PrimaryButton>
+      <View style={styles.buttonsFormatter}>
+        <View style={styles.buttonContainer}>
+          <PrimaryButton onPress={resetInputHandler}>Reset</PrimaryButton>
+        </View>
+        <View style={styles.buttonContainer}>
+          <PrimaryButton onPress={confirmInputHandler}>Confirm</PrimaryButton>
+        </View>
+      </View>
     </View>
   );
 }
@@ -30,6 +57,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 1, height: 2},
     shadowRadius: 6,
     shadowOpacity: 0.25,
+    alignItems: 'center',
   },
   numberInput: {
     height: 50,
@@ -41,5 +69,11 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  buttonsFormatter: {
+    flexDirection: 'row',
+  },
+  buttonContainer: {
+    flex: 1,
   },
 });
